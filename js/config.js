@@ -24,7 +24,8 @@ window.SIGNET_CONFIG = {
 
   // HANDOFF_web.md §3 timeline, seconds from playback start. The stub viewer runs on
   // these; the live bundle fires the same callbacks from its own clock.
-  timeline: { black: 1.2, lightsFull: 4.0, introEnd: 15.0, wordmark: 15.5, wordmarkFull: 17.5 },
+  // introEnd is the film's length since 2026-09-30: 6.85 s rendered, played at half speed.
+  timeline: { black: 1.2, lightsFull: 4.0, introEnd: 13.7, wordmark: 13.7, wordmarkFull: 15.7 },
 
   // R5: email provider decided when the form is built. Until then `endpoint` is empty
   // and the form simulates success locally (console warning). To wire a provider: set
@@ -76,7 +77,8 @@ window.SIGNET_CONFIG = {
 
   // The drag hint in the void between the render and the lockup. Shown when the ring's intro lands
   // and rotation unlocks; retired by the first drag, or by autoHideMs if nobody touches it.
-  dragHint: { enabled: true, autoHideMs: 12000 },
+  // Off since the film replaced the live render (2026-09-30): a film cannot be dragged.
+  dragHint: { enabled: false, autoHideMs: 12000 },
 
   capture: {
     endpoint: "",

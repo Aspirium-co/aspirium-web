@@ -2,11 +2,11 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Signet by ASPIRIUM</title>
+<title>Gemtronic by ASPIRIUM</title>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <!-- §1a name cascade: noindex, no OG image, nothing public until both names clear -->
 <meta name="robots" content="noindex, nofollow">
-<meta name="description" content="Signet by ASPIRIUM. Edition 001.">
+<meta name="description" content="Gemtronic by ASPIRIUM. An electronic gem ring.">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <link rel="icon" href="data:,">
@@ -40,12 +40,12 @@
       <!-- hero band: viewer mount + poster fallback. Black until the viewer is ready.
            Height stays --band-h (R2 desktop 45–50 vh, R4 phones ~1:1) inside the full-screen panel:
            the camera is vertical-fit, so a full-portrait band would crop the ring's sides. -->
-      <section class="band" id="band" data-state="boot" aria-label="Signet">
-        <div class="band__mount" id="viewer" role="img" aria-label="Signet ring, lit from within"></div>
+      <section class="band" id="band" data-state="boot" aria-label="Gemtronic">
+        <div class="band__mount" id="viewer" role="img" aria-label="Gemtronic ring, lit from within"></div>
+        <!-- poster = the film's last frame (2026-09-30), one square for every device -->
         <picture class="band__poster" id="poster">
-          <source media="(max-width: 767px)" srcset="assets/poster/signet-end-pose-1x1.jpg">
-          <img src="assets/poster/signet-end-pose-2x1.jpg" alt="Signet ring, lit from within"
-               width="2000" height="1000" fetchpriority="low" decoding="async">
+          <img src="assets/poster/gemtronic-end-pose-1x1.jpg" alt="Gemtronic ring, lit from within"
+               width="1080" height="1080" fetchpriority="low" decoding="async">
         </picture>
 
       </section>
@@ -69,8 +69,8 @@
            js/mark.js splits each line into per-character cells and decodes them one at a time, held
            until the ring's intro is 5% in. The characters here are the copy source; the h1 carries the
            accessible name because letter-split text is otherwise read out letter by letter. -->
-      <h1 class="mark" id="mark" aria-label="The Signet by ASPIRIUM">
-        <span class="mark__line mark__line--sub" data-mark-line aria-hidden="true">The Signet by</span>
+      <h1 class="mark" id="mark" aria-label="Gemtronic by ASPIRIUM">
+        <span class="mark__line mark__line--sub" data-mark-line aria-hidden="true">Gemtronic by</span>
         <span class="mark__line mark__line--name" data-mark-line aria-hidden="true">ASPIRIUM</span>
       </h1>
 
@@ -91,7 +91,12 @@
            Previous text: "A signet ring with a companion inside. Leave an email and you will know the
            date before anyone else does." (the brief's "Numbered editions, one drop." was already held
            back under R6)
-           <p class="lede">…</p> -->
+           <p class="lede">…</p>
+           Product intro added 2026-09-30 (Linzhi), with the rename to Gemtronic. -->
+      <p class="lede">Gemtronic is a smart ring that turns a tiny round LCD screen into a new kind of
+        gem. Both avant-garde jewelry and a feat of electronics that fits real function into extremely
+        tight space, it delivers gesture controls, mini-games, a step-driven digital pet and Bluetooth
+        phone pairing through an ESP32-C3 and its sensors.</p>
 
       <!-- capture form: custom markup, present from first paint, works without JS once an endpoint exists (R5). -->
       <form class="capture" id="capture" method="post" action="#" novalidate

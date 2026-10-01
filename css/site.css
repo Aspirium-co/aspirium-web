@@ -133,14 +133,30 @@ body {
   overflow: hidden;
 }
 .band__mount, .band__poster { position: absolute; inset: 0; }
-.band__mount > canvas, .band__mount > iframe, .band__mount > .stub {
+.band__mount > canvas, .band__mount > iframe, .band__mount > .stub, .band__mount > .film {
   position: absolute; inset: 0; width: 100%; height: 100%; display: block; border: 0;
 }
 .stub { overflow: hidden; touch-action: pan-y; user-select: none; -webkit-user-select: none; }
 .stub img { width: 100%; height: 100%; object-fit: contain; display: block; opacity: 0; }
 .band__poster { display: none; }
 .band[data-state="poster"] .band__poster { display: block; }
-.band__poster img { width: 100%; height: 100%; object-fit: contain; display: block; background: var(--field); }
+.band__poster img { width: 100%; height: 100%; object-fit: contain; display: block; background: transparent; }
+/* The film (2026-09-30) is square and its background is a gradient, black at the top and grey at the
+   bottom. A round fade sized to the square melts that background into the page's black, so it reads
+   as a spotlight rather than a box. Solid to 62% of the radius, which keeps the whole ring clear. */
+/* Bigger and with more glow (Linzhi, 2026-09-30): on desktop the film is drawn 1.3x the band and
+   spills past it. Only the faded glow spills; the ring itself still ends above the lockup. Phones
+   stay at 1x, because the band is already the full screen width and the glow would hit its edges. */
+.band { --film-scale: 1.3; }
+@media (max-width: 767px) { .band { --film-scale: 1; } }
+.band:has(.film), .band[data-state="poster"] { overflow: visible; }
+.film { object-fit: contain; background: transparent; }
+.film, .band__poster img {
+  transform: scale(var(--film-scale));
+  --spot: radial-gradient(circle calc(var(--band-h) / 2) at 50% 50%,
+          #000 70%, rgba(0,0,0,.84) 77%, rgba(0,0,0,.5) 86%, rgba(0,0,0,.16) 94%, transparent 100%);
+  -webkit-mask-image: var(--spot); mask-image: var(--spot);
+}
 
 /* ---- the capture panel's column ---- */
 .sheet { width: 100%; max-width: var(--col); margin: 0 auto; padding: 2rem var(--gutter) 3rem; }
@@ -165,6 +181,7 @@ body {
   color: var(--text);
 }
 .lede { margin: 0 0 2.5rem; max-width: 36rem; }
+.panel--capture .lede { margin-left: auto; margin-right: auto; }   /* same 36rem column as the form below it */
 
 /* ---- drag hint ----
    Ported from the pipeline's check page. It lands in the void the lockup's --mark-drop opens up:

@@ -115,7 +115,8 @@
   // live bundle by default; the stub only through dev/tune.html or dev/check.mjs ("stub", "stub:slow", "stub:fail")
   const loadViewer = useStub => new Promise((resolve, reject) => {
     const s = document.createElement("script");
-    s.src = new URL(useStub ? "viewer-stub.js" : "viewer-embed.js", here).href;
+    // The film replaced the live WebGL bundle (viewer-embed.js) on 2026-09-30 (Linzhi): it stuttered.
+    s.src = new URL(useStub ? "viewer-stub.js" : "viewer-video.js", here).href;
     s.async = true;
     s.onload = () => window.SignetViewer ? resolve(window.SignetViewer) : reject(new Error("viewer script defined nothing"));
     s.onerror = () => reject(new Error("viewer script failed to load"));
@@ -123,7 +124,7 @@
   });
 
   const boot = async () => {
-    if (dev.nowebgl || !hasWebGL2()) return showPoster("no WebGL2");
+    if (dev.nowebgl || (("stub" in dev) && !hasWebGL2())) return showPoster("no WebGL2");   // the film needs no WebGL
     const timer = setTimeout(() => { if (state === "boot") showPoster(`not ready within ${SITE.readyTimeoutMs} ms`); }, SITE.readyTimeoutMs);
     const intro = dev.intro || (reduced ? "skip" : "play");
     try {

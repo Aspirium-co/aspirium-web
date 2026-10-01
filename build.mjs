@@ -31,7 +31,7 @@ const order = [
   ...walk(join(root, "assets")).filter(f => !/assets\/poster\/.*\.png$/.test(f) && !/assets\/mark\//.test(f)),   // both lockup rasters are retired; kept on disk for reuse
   join(root, "css/site.css"),
   join(root, "viewer/bundle.js"), join(root, "viewer/index.html"),
-  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/main.js"),
+  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"),
   join(root, "privacy.html"), join(root, "index.html"), join(root, "robots.txt"), join(root, "_headers"),
   join(root, "CNAME"),
 ];
