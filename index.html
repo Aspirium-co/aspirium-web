@@ -27,10 +27,17 @@
 <script src="js/config.js" defer></script>
 <script src="js/mark.js" defer></script>
 <script src="js/main.js" defer></script>
+<!-- the live ring in the about panel (js/ring3d.js). An import map is how a module finds "three"
+     without a bundler; build.mjs rewrites the path to the hashed file. -->
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js" } }</script>
+<script type="module" src="js/ring3d.js"></script>
 <!-- analytics slot (§7): cookieless only — Cloudflare Web Analytics or Plausible — added once hosting is ruled (§8). No consent banner. -->
 </head>
 <body>
 <main class="page">
+
+  <!-- the live ring: fixed over the page, drawn only while the about panel needs it (js/ring3d.js) -->
+  <canvas class="ring3d" id="ring3d" aria-hidden="true"></canvas>
 
   <!-- PANEL 1 — the ring and the lockup, one screen (Eric, 2026-09-09). Sticky: the capture panel
        slides over it while its contents drift and fade (js/main.js sets --p, css/site.css spends it). -->
@@ -83,7 +90,25 @@
     </div>
   </section>
 
-  <!-- PANEL 2 — capture. Opaque, so it covers the sticky hero as it arrives. -->
+  <!-- PANEL 2 — about (2026-09-30, Linzhi; after neoconda.com). The ring arrives on the left from the
+       hero along an S and can be dragged round; the copy fills in on the right. The panel is taller
+       than the screen and its inside is sticky, so there is a stretch to stop and turn the ring. -->
+  <section class="panel panel--about" id="about" aria-labelledby="about-title">
+    <div class="about__inner">
+      <div class="about__stage" id="about-stage" role="img" aria-label="Gemtronic ring. Drag to turn it."></div>
+      <div class="about__copy">
+        <p class="eyebrow">About the ring</p>
+        <h2 class="about__title" id="about-title">A new kind of gem.</h2>
+        <p class="about__body">Gemtronic is a smart ring that turns a tiny round LCD screen into a new kind of
+          gem. Both avant-garde jewelry and a feat of electronics that fits real function into extremely
+          tight space, it delivers gesture controls, mini-games, a step-driven digital pet and Bluetooth
+          phone pairing through an ESP32-C3 and its sensors.</p>
+        <p class="about__hint">Drag to turn it</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PANEL 3 — capture. Opaque, so it covers the sticky hero as it arrives. -->
   <section class="panel panel--capture" id="capture-panel">
     <div class="sheet">
 
@@ -92,11 +117,7 @@
            date before anyone else does." (the brief's "Numbered editions, one drop." was already held
            back under R6)
            <p class="lede">…</p>
-           Product intro added 2026-09-30 (Linzhi), with the rename to Gemtronic. -->
-      <p class="lede">Gemtronic is a smart ring that turns a tiny round LCD screen into a new kind of
-        gem. Both avant-garde jewelry and a feat of electronics that fits real function into extremely
-        tight space, it delivers gesture controls, mini-games, a step-driven digital pet and Bluetooth
-        phone pairing through an ESP32-C3 and its sensors.</p>
+           The product intro now lives in the about panel above (2026-09-30). -->
 
       <!-- capture form: custom markup, present from first paint, works without JS once an endpoint exists (R5). -->
       <form class="capture" id="capture" method="post" action="#" novalidate

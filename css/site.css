@@ -105,7 +105,7 @@ body {
   pointer-events: none;
 }
 .panel--capture {
-  z-index: 1;                               /* opaque, so it covers the sticky hero as it arrives */
+  z-index: 4;                               /* opaque, so it covers the hero, and the live ring (z 2) as it leaves */
   background: var(--field);
   min-height: 100vh;
   /* the form sits in the middle of the screen, both axes (Eric, 2026-09-09 pm); the footer is
@@ -122,6 +122,69 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .hero__inner { transform: none; opacity: 1; }
   .cue { opacity: 1; }
+}
+
+/* ---- about: the live ring and the intro (2026-09-30, after neoconda.com) ----
+   The canvas is fixed over the whole page and draws nothing until the scroll starts (js/ring3d.js).
+   The panel is taller than the screen and its inside is sticky: a stretch where the ring stands
+   still on the left to be turned, before the capture panel comes up over both. */
+.ring3d {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 2; pointer-events: none; opacity: 0;
+}
+.panel--about { z-index: 1; background: var(--field); height: 170vh; }
+.about__inner {
+  position: sticky; top: 0; height: 100vh;
+  display: grid; grid-template-columns: 1fr 1fr; align-items: center;
+  gap: clamp(2rem, 5vw, 6rem);
+  max-width: 88rem; margin: 0 auto; padding: 0 clamp(1.5rem, 6vw, 7rem);
+}
+.about__stage { position: relative; height: min(70vh, 40vw); touch-action: pan-y; user-select: none; -webkit-user-select: none; }
+.about__stage.is-live { cursor: grab; }
+.about__stage.is-dragging { cursor: grabbing; }
+/* no live ring (no WebGL2, or it failed): the film's last frame stands in */
+.no-ring3d .about__stage {
+  background: url("../assets/poster/gemtronic-end-pose-1x1.jpg") center / contain no-repeat;
+  -webkit-mask-image: radial-gradient(closest-side, #000 70%, transparent);
+  mask-image: radial-gradient(closest-side, #000 70%, transparent);
+}
+.about__copy { position: relative; z-index: 3; max-width: 34rem; }
+/* each line arrives from the right in turn as the ring lands; --ap (0…1) is set by js/ring3d.js */
+.about__copy > * {
+  --o: clamp(0, (var(--ap, 1) - var(--i, 0) * .18) / .46, 1);
+  opacity: var(--o);
+  transform: translate3d(calc((1 - var(--o)) * 2.5rem), 0, 0);
+}
+.about__copy > :nth-child(2) { --i: 1; }
+.about__copy > :nth-child(3) { --i: 2; }
+.about__copy > :nth-child(4) { --i: 3; }
+.eyebrow {
+  margin: 0 0 1.25rem;
+  font: 400 .8125rem/1 var(--body); letter-spacing: .18em; text-transform: uppercase; color: var(--metal);
+}
+.about__title {
+  margin: 0 0 1.5rem;
+  font: 300 clamp(2.25rem, 4.4vw, 4rem)/1.08 var(--lockup); letter-spacing: -.01em; color: var(--text);
+  text-wrap: balance;
+}
+.about__body { margin: 0; color: var(--muted); }
+.about__hint {
+  margin: 2rem 0 0;
+  font: 400 .6875rem/1 var(--body); letter-spacing: .18em; text-transform: uppercase; color: var(--muted);
+}
+.no-ring3d .about__hint { display: none; }
+@media (max-width: 767px) {
+  .panel--about { height: 150svh; }
+  .about__inner {
+    height: 100svh; grid-template-columns: 1fr; grid-template-rows: auto auto;
+    align-content: center; gap: 1.5rem; padding: 0 var(--gutter);
+  }
+  .about__stage { height: 42svh; }
+  .about__title { margin-bottom: 1rem; }
+  .about__hint { margin-top: 1.25rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .about__copy > * { transform: none; }
 }
 
 /* ---- hero band ---- */
@@ -181,7 +244,6 @@ body {
   color: var(--text);
 }
 .lede { margin: 0 0 2.5rem; max-width: 36rem; }
-.panel--capture .lede { margin-left: auto; margin-right: auto; }   /* same 36rem column as the form below it */
 
 /* ---- drag hint ----
    Ported from the pipeline's check page. It lands in the void the lockup's --mark-drop opens up:

@@ -30,8 +30,15 @@ const order = [
   // raster. NOT the whole assets/mark folder — the house wordmark lives there and is referenced.
   ...walk(join(root, "assets")).filter(f => !/assets\/poster\/.*\.png$/.test(f) && !/assets\/mark\//.test(f)),   // both lockup rasters are retired; kept on disk for reuse
   join(root, "css/site.css"),
+  // three.js for the live ring (js/ring3d.js): the core before the module that imports it, the
+  // shared util before the loader that imports it
+  join(root, "vendor/three/three.core.min.js"), join(root, "vendor/three/three.module.min.js"),
+  join(root, "vendor/three/addons/utils/BufferGeometryUtils.js"),
+  join(root, "vendor/three/addons/loaders/GLTFLoader.js"), join(root, "vendor/three/addons/loaders/DRACOLoader.js"),
+  join(root, "vendor/three/draco/draco_wasm_wrapper.js"), join(root, "vendor/three/draco/draco_decoder.wasm"),
+  join(root, "vendor/three/LICENSE"),
   join(root, "viewer/bundle.js"), join(root, "viewer/index.html"),
-  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"),
+  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"), join(root, "js/ring3d.js"),
   join(root, "privacy.html"), join(root, "index.html"), join(root, "robots.txt"), join(root, "_headers"),
   join(root, "CNAME"),
 ];
@@ -48,7 +55,10 @@ for (const abs of order) {
     }
     buf = Buffer.from(text, "utf8");
   }
-  const dst = (NOHASH.has(basename(rel)) || rel.endsWith(".md")) ? rel : hashName(rel, buf);
+  // The Draco decoder is fetched by name from a folder (DRACOLoader.setDecoderPath), and LICENSE has no
+  // extension to hash around; both keep their names.
+  const keep = /[\\/]draco[\\/]/.test(rel) || basename(rel) === "LICENSE";
+  const dst = (NOHASH.has(basename(rel)) || rel.endsWith(".md") || keep) ? rel : hashName(rel, buf);
   mapping.set(rel, dst);
   mkdirSync(join(out, dirname(dst)), { recursive: true });
   writeFileSync(join(out, dst), buf);
