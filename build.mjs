@@ -38,7 +38,7 @@ const order = [
   join(root, "vendor/three/draco/draco_wasm_wrapper.js"), join(root, "vendor/three/draco/draco_decoder.wasm"),
   join(root, "vendor/three/LICENSE"),
   join(root, "viewer/bundle.js"), join(root, "viewer/index.html"),
-  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"), join(root, "js/ring3d.js"), join(root, "js/cursor-fx.js"),
+  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"), join(root, "js/ring3d.js"), join(root, "js/cursor-fx.js"), join(root, "js/features.js"),
   join(root, "privacy.html"), join(root, "index.html"), join(root, "robots.txt"), join(root, "_headers"),
   join(root, "CNAME"),
 ];
@@ -55,9 +55,9 @@ for (const abs of order) {
     }
     buf = Buffer.from(text, "utf8");
   }
-  // The Draco decoder is fetched by name from a folder (DRACOLoader.setDecoderPath), and LICENSE has no
-  // extension to hash around; both keep their names.
-  const keep = /[\\/]draco[\\/]/.test(rel) || basename(rel) === "LICENSE";
+  // The Draco decoder and the ring's screen frames (assets/ui) are fetched by name from a folder, and
+  // LICENSE has no extension to hash around; all keep their names.
+  const keep = /[\\/]draco[\\/]|assets[\\/]ui[\\/]/.test(rel) || basename(rel) === "LICENSE";
   const dst = (NOHASH.has(basename(rel)) || rel.endsWith(".md") || keep) ? rel : hashName(rel, buf);
   mapping.set(rel, dst);
   mkdirSync(join(out, dirname(dst)), { recursive: true });

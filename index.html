@@ -32,6 +32,7 @@
 <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js" } }</script>
 <script type="module" src="js/ring3d.js"></script>
 <script type="module" src="js/cursor-fx.js"></script>
+<script type="module" src="js/features.js"></script>
 <!-- analytics slot (§7): cookieless only — Cloudflare Web Analytics or Plausible — added once hosting is ruled (§8). No consent banner. -->
 </head>
 <body>
@@ -111,7 +112,51 @@
     </div>
   </section>
 
-  <!-- PANEL 3 — capture. Opaque, so it covers the sticky hero as it arrives. -->
+  <!-- PANEL 3 — features (2026-10-01, Linzhi; after neoconda.com's feature list). The live ring moves
+       to the centre and stays there while the list scrolls past on both sides; the item at the centre of
+       the screen, or the one clicked, puts its screens on the ring. Every screen is the firmware's own
+       160x160 output (NIGHT theme), exported by tools/export_ui_handoff.py in the Aspirium repo --
+       except pet-lizard.png, made for this page (Linzhi, 2026-10-01): no firmware screen shows the
+       adult lizard alone. It is Linzhi's drawing (design/device-ui-reference/assets/pet/game/
+       lizard-stage3.PNG) reduced to pixels the way ui/tools/generate_pet_heads.py does, at
+       coverage 110, in the NIGHT pet and paper colours. -->
+  <section class="panel panel--features" id="features" aria-labelledby="features-title">
+    <header class="features__head">
+      <p class="eyebrow">Features</p>
+      <h2 class="features__title" id="features-title">Everything it does, on an 18&nbsp;mm screen.</h2>
+    </header>
+    <div class="features__body">
+      <div class="features__stage" id="features-stage" aria-hidden="true"></div>
+      <ol class="features__list">
+        <li><button class="feat" type="button" data-screens="face-gem-dragon">
+          <span class="feat__n">01</span><span class="feat__t">Five gems</span><span class="feat__d">Ruby, emerald and amber, and two eyes drawn from real rings. A light turns across the facets.</span>
+        </button></li>
+        <li><button class="feat" type="button" data-screens="face-clock-network face-clock-rain">
+          <span class="feat__n">02</span><span class="feat__t">Clock</span><span class="feat__d">Time, date and the day's weather, set over Wi-Fi while it charges.</span>
+        </button></li>
+        <li><button class="feat" type="button" data-screens="game-play game-hit">
+          <span class="feat__n">03</span><span class="feat__t">Tilt to steer</span><span class="feat__d">Roll your finger and the pet moves; the motion sensor is the controller. It is how you play Starship.</span>
+        </button></li>
+        <li><button class="feat" type="button" data-screens="idle-clock idle-gem idle-rest">
+          <span class="feat__n">04</span><span class="feat__t">Flick or press</span><span class="feat__d">Tip the ring to move through the menus and flick it in the air to pick, or use its two buttons.</span>
+        </button></li>
+        <li><button class="feat" type="button" data-screens="pet-lizard">
+          <span class="feat__n">05</span><span class="feat__t">Blind-box pet</span><span class="feat__d">One of five companions hatches from the egg, then changes form three more times.</span>
+        </button></li>
+        <li><button class="feat" type="button" data-screens="exercise-walking exercise-settled">
+          <span class="feat__n">06</span><span class="feat__t">Walk to grow</span><span class="feat__d">Steps feed it. With an ordinary day's walking it hatches in four or five days.</span>
+        </button></li>
+        <li><button class="feat" type="button" data-screens="rhythm-strike rhythm-decay rhythm-between">
+          <span class="feat__n">07</span><span class="feat__t">Rhythm</span><span class="feat__d">Play music near it and the stars on the screen strike with the beat.</span>
+        </button></li>
+        <li><button class="feat" type="button" data-screens="settings-ble">
+          <span class="feat__n">08</span><span class="feat__t">Bluetooth</span><span class="feat__d">Pairs with your phone from its own Bluetooth settings, no app needed. Phone notifications are next.</span>
+        </button></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- PANEL 4 — capture. Opaque, so it covers the sticky hero as it arrives. -->
   <section class="panel panel--capture" id="capture-panel">
     <div class="sheet">
 

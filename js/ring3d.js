@@ -28,6 +28,10 @@ const doc = document.documentElement;
 const canvas = document.getElementById("ring3d");
 const about = document.getElementById("about");
 const stage = document.getElementById("about-stage");
+const featStage = document.getElementById("features-stage");
+const UI_DIR = new URL("../assets/ui/", import.meta.url).href;   // the firmware's frames; build.mjs keeps their names
+const UI_FIT = 0.86;      // the frame's 160 px circle, shrunk to sit inside the bezel's opening whole
+const FRAME_MS = 900;                                            // how long each of an item's screens shows
 const band = document.getElementById("band");
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -123,18 +127,47 @@ async function start() {
 
   // The lit display. In the bake it is black until its power-on animation, which this page does not
   // play, so it gets the film's orange as an unlit disc just under the wordmark.
+  let orangeDisc = null, uiDisc = null;
   if (logo) {
-    const disc = new THREE.Mesh(
+    orangeDisc = new THREE.Mesh(
       new THREE.CircleGeometry(SCREEN_R, 96),
       new THREE.MeshBasicMaterial({ color: SCREEN_ORANGE, toneMapped: false }),
     );
-    disc.rotation.set(-Math.PI / 2, 0, 0);
-    disc.position.copy(logo.position);
-    disc.position.y += 0.02;                     // just clear of the display surface, or they fight in the depth buffer
-    logo.parent.add(disc);
-    logo.position.y += 0.05;                     // and the wordmark just clear of the disc
+    orangeDisc.rotation.set(-Math.PI / 2, 0, 0);
+    orangeDisc.position.copy(logo.position);
+    orangeDisc.position.y += 0.02;               // just clear of the display surface, or they fight in the depth buffer
+    logo.parent.add(orangeDisc);
+    // In the features panel the screen shows the firmware's own frames instead (js/features.js
+    // picks them): a second disc, above the wordmark, nearest-neighbour so the pixels stay pixels.
+    uiDisc = new THREE.Mesh(
+      new THREE.CircleGeometry(SCREEN_R, 96),
+      new THREE.MeshBasicMaterial({ toneMapped: false }),
+    );
+    uiDisc.rotation.copy(orangeDisc.rotation);
+    uiDisc.position.copy(orangeDisc.position);
+    uiDisc.position.y += 0.08;
+    uiDisc.scale.setScalar(UI_FIT);
+    uiDisc.visible = false;
+    logo.parent.add(uiDisc);
+    logo.position.y += 0.05;                     // and the wordmark just clear of the orange disc
     logo.renderOrder = 1;
   }
+  // every frame any feature names, loaded up front so switching never waits
+  const uiTex = {};
+  const frameNames = new Set(["idle"]);
+  document.querySelectorAll(".feat[data-screens]").forEach(el => el.dataset.screens.split(/\s+/).forEach(n => frameNames.add(n)));
+  const texLoader = new THREE.TextureLoader();
+  await Promise.all([...frameNames].map(async n => {
+    try {
+      const tx = await texLoader.loadAsync(UI_DIR + n + ".png");
+      tx.colorSpace = THREE.SRGBColorSpace;
+      tx.magFilter = THREE.NearestFilter;
+      tx.minFilter = THREE.LinearFilter;
+      tx.generateMipmaps = false;
+      uiTex[n] = tx;
+    } catch { /* a missing frame leaves the previous one up */ }
+  }));
+  if (uiDisc && uiTex.idle) uiDisc.material.map = uiTex.idle;
 
   // The bake's screen faces +Y; stand the ring up so it faces the camera, then centre it on the pivot.
   const holder = new THREE.Group();
@@ -252,6 +285,7 @@ void main() {
     return false;
   };
 
+  let screenCycling = false;
   let W = 0, H = 0;
   const resize = () => {
     W = window.innerWidth; H = window.innerHeight;
@@ -277,25 +311,36 @@ void main() {
     const ARRIVE = 0.8;
     const e = reduced ? (p > 0 ? 1 : 0) : smooth(clamp(p / ARRIVE, 0, 1));
     const release = Math.max(0, y0 - (top + about.offsetHeight - H));
+    // where the features stage is: the ring glides from the about panel to it as it comes up
+    const fr = featStage ? featStage.getBoundingClientRect() : null;
+    let q = 0;
+    if (fr && fr.height) q = clamp((H - fr.top) / Math.max(1, H / 2 + fr.height / 2), 0, 1);
+    const fq = reduced ? (q > 0.5 ? 1 : 0) : smooth(q);
 
     const b = band.getBoundingClientRect();
     const sx = b.left + b.width / 2, sy = b.top + b.height / 2;
     const sh = b.height * FILM_RING * filmScale();
     // where the stage is right now: it moves with the panel, so the ring and the copy move as one
+    // Once the about panel starts to leave, the ring stays where it landed (+ release) and waits for
+    // the features stage instead of riding off the top of the screen.
     const r = stage.getBoundingClientRect();
-    const ex = r.left + r.width / 2, ey = r.top + r.height / 2;
+    const ex = r.left + r.width / 2, ey = r.top + r.height / 2 + release;
     const eh = r.height * 0.86;
 
     // an S: out to the right, across past the stage, back onto it
-    const x = bezier(sx, sx + W * 0.2, ex - W * 0.16, ex, e);
-    const y = bezier(sy, lerp(sy, ey, 0.35) + H * 0.06, ey - H * 0.08, ey, e);
-    const h = lerp(sh, eh, e);
+    const ax = bezier(sx, sx + W * 0.2, ex - W * 0.16, ex, e);
+    const ay = bezier(sy, lerp(sy, ey, 0.35) + H * 0.06, ey - H * 0.08, ey, e);
+    const ah = lerp(sh, eh, e);
+    // then on to the features stage, rising a little on the way
+    const x = fr ? lerp(ax, fr.left + fr.width / 2, fq) : ax;
+    const y = fr ? lerp(ay, fr.top + fr.height / 2, fq) - Math.sin(Math.PI * fq) * H * 0.05 : ay;
+    const h = fr ? lerp(ah, fr.height * 0.86, fq) : ah;
 
     const upp = (2 * DIST * Math.tan((FOV * Math.PI) / 360)) / H;   // world units per CSS pixel at z = 0
     pivot.position.set((x - W / 2) * upp, -(y - H / 2) * upp, 0);
     pivot.scale.setScalar((h * upp) / ringH);
 
-    interactive = p >= ARRIVE && release < H * 0.5;
+    interactive = p >= ARRIVE && release < H * 0.5 && fq < 0.05;
     if (!drag) {                                                     // let a flick run down
       vYaw *= 0.94; vPitch *= 0.9;
       if (Math.abs(vYaw) > 1e-4) dragYaw += vYaw;
@@ -306,14 +351,32 @@ void main() {
     // chrome, and the ring leans a little towards it
     aim.x += (aim.tx - aim.x) * 0.08; aim.y += (aim.ty - aim.y) * 0.08;
     lightMoving = Math.abs(aim.tx - aim.x) + Math.abs(aim.ty - aim.y) > 0.002;
-    const lean = interactive && !drag ? 1 : 0;
+    const lean = (interactive || fq > 0.98) && !drag ? 1 : 0;
+    // into the features the ring turns once more and comes round to face front, whatever the drag left
+    const front = dragYaw - Math.round(dragYaw / (Math.PI * 2)) * Math.PI * 2;
+    const yawHeld = dragYaw - front * fq;
     scene.environmentRotation.set(-aim.y * 0.9, aim.x * 1.4, 0);
     key.position.set(aim.x * 520, -aim.y * 420 + 120, 420);
     pivot.rotation.set(
-      Math.sin(Math.PI * e) * 0.45 + dragPitch + aim.y * 0.16 * lean,
-      e * Math.PI * 2 + dragYaw + sway + aim.x * 0.22 * lean,
+      Math.sin(Math.PI * e) * 0.45 + dragPitch * (1 - fq) + Math.sin(Math.PI * fq) * 0.3 + aim.y * 0.16 * lean,
+      e * Math.PI * 2 + yawHeld + fq * Math.PI * 2 + sway * (1 - fq) + aim.x * 0.22 * lean,
       Math.sin(Math.PI * e) * -0.18,
     );
+
+    // the screen: the film's orange in the about panel, the firmware's frames in the features
+    if (uiDisc) {
+      const ui = fq > 0.5;
+      uiDisc.visible = ui;
+      orangeDisc.visible = !ui;
+      logo.visible = !ui;
+      if (ui) {
+        const sc = window.__ringScreen || { frames: ["idle"], since: 0 };
+        const n = sc.frames[Math.floor(Math.max(0, t - sc.since) / FRAME_MS) % sc.frames.length];
+        const tx = uiTex[n];
+        if (tx && uiDisc.material.map !== tx) uiDisc.material.map = tx;
+        screenCycling = sc.frames.length > 1;
+      }
+    }
 
     // the canvas takes over from the film at the very start of the scroll
     const show = reduced ? (p > 0 ? 1 : 0) : smooth(clamp(p / 0.08, 0, 1));
@@ -322,10 +385,11 @@ void main() {
     about.style.setProperty("--ap", clamp((p - 0.4) / (ARRIVE - 0.4), 0, 1).toFixed(3));   // copy done when the ring lands
     stage.classList.toggle("is-live", interactive);
 
-    const onScreen = show > 0 && release < H * 1.2;
+    const onScreen = show > 0 && (fr ? fr.bottom > -H * 0.2 && (release < H * 1.2 || q > 0) : release < H * 1.2);
     // the ring's footprint, which js/cursor-fx.js keeps its lit pixels off
     window.__ringRect = onScreen && show > 0.5 ? { cx: x, cy: y, rx: h * 0.4, ry: h * 0.52 } : null;
-    const moving = !reduced && (interactive || drag || Math.abs(vYaw) > 1e-4) || (p > 0 && p < 1) || release > 0;
+    const moving = !reduced && (interactive || drag || Math.abs(vYaw) > 1e-4) || (p > 0 && p < 1) || release > 0
+      || (q > 0 && q < 1) || (fq > 0.5 && screenCycling);
     return { onScreen, moving };
   };
 
