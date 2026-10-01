@@ -38,7 +38,7 @@ const order = [
   join(root, "vendor/three/draco/draco_wasm_wrapper.js"), join(root, "vendor/three/draco/draco_decoder.wasm"),
   join(root, "vendor/three/LICENSE"),
   join(root, "viewer/bundle.js"), join(root, "viewer/index.html"),
-  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"), join(root, "js/ring3d.js"),
+  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"), join(root, "js/ring3d.js"), join(root, "js/cursor-fx.js"),
   join(root, "privacy.html"), join(root, "index.html"), join(root, "robots.txt"), join(root, "_headers"),
   join(root, "CNAME"),
 ];

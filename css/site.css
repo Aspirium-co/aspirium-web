@@ -132,6 +132,12 @@ body {
   position: fixed; inset: 0; width: 100%; height: 100%;
   z-index: 2; pointer-events: none; opacity: 0;
 }
+/* The lit dot matrix (js/cursor-fx.js): over every panel, blended by difference, so the dots show
+   orange on the black ground and text under a dot turns to its complement. */
+.pixels {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  z-index: 10; pointer-events: none; mix-blend-mode: difference;
+}
 .panel--about { z-index: 1; background: var(--field); height: 170vh; }
 .about__inner {
   position: sticky; top: 0; height: 100vh;

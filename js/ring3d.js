@@ -5,7 +5,8 @@
 // once, and leaves it there to be dragged round. Reference: neoconda.com, "About the device".
 //
 // Kept light on purpose, because the old live render stuttered: the model is Eric's bake run through
-// gltf-transform (9.1 MB -> 0.6 MB, 3.0 M -> 0.6 M vertices, 1024 px WebP), no post-processing, no
+// gltf-transform (9.1 MB -> 1.5 MB, 1024 px WebP, Draco; no simplification -- at 20% and at 50% of
+// the triangles the fine bezel round the screen came out jagged, Linzhi 2026-10-01), no post-processing, no
 // transmission (it renders the scene twice), pixel ratio capped at 1.5, and nothing is drawn while the
 // ring is off screen or standing still.
 //
@@ -149,7 +150,7 @@ async function start() {
   if (new URLSearchParams(location.search).has("ring-debug")) window.__ring = { THREE, scene, camera, renderer, pivot, holder, model, wake: () => wake(), draw: () => frame(performance.now()) };
 
   // ---- dragging: yaw is free, pitch is limited, a flick keeps turning for a moment ----
-  let dragYaw = 0, dragPitch = 0, vYaw = 0, vPitch = 0, drag = null, interactive = false;
+  let dragYaw = 0, dragPitch = 0, vYaw = 0, vPitch = 0, drag = null, interactive = false, dragEnded = -1e9;
   stage.addEventListener("pointerdown", e => {
     if (!interactive) return;
     drag = { id: e.pointerId, x: e.clientX, y: e.clientY };
@@ -169,16 +170,87 @@ async function start() {
   const endDrag = e => {
     if (!drag || e.pointerId !== drag.id) return;
     drag = null;
+    dragEnded = performance.now();
     stage.classList.remove("is-dragging");
   };
   stage.addEventListener("pointerup", endDrag);
   stage.addEventListener("pointercancel", endDrag);   // the browser took it as a scroll
   stage.addEventListener("lostpointercapture", endDrag);
 
+  // ---- the pointer as the light (mouse only): -1..1 across the screen, eased in place() ----
+  const aim = { x: 0, y: 0, tx: 0, ty: 0, on: false };
+  let lightMoving = false;
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches && !reduced) {
+    addEventListener("pointermove", e => {
+      if (e.pointerType !== "mouse") return;
+      aim.tx = (e.clientX / innerWidth) * 2 - 1;
+      aim.ty = (e.clientY / innerHeight) * 2 - 1;
+      aim.on = true;
+      wake();
+    }, { passive: true });
+  }
+
   // ---- where the ring is, from the scroll position ----
   const filmScale = () => parseFloat(getComputedStyle(band).getPropertyValue("--film-scale")) || 1;
   // the film's ring fills about 74% of the square frame's height (measured on its last frame)
   const FILM_RING = 0.74;
+
+  // ---- where the mouse's smoke (js/cursor-fx.js) passes behind the ring, the ring breaks up like a
+  // bad signal: rows slip sideways and red and blue come apart, in the ring's own colours. (A
+  // negative, a false-colour heat map and a plain mosaic were each tried on 2026-09-30/10-01 and
+  // each fought the ring; this is the one Linzhi kept.) The smoke itself never covers the ring --
+  // the dots stop at its outline -- so the ring stays in front. A second pass over the finished
+  // frame; the smoke's shape is the small mask cursor-fx reads back.
+  const maskTex = new THREE.DataTexture(new Uint8Array(4), 1, 1);
+  maskTex.magFilter = maskTex.minFilter = THREE.LinearFilter;
+  let maskFrame = -1;
+  const glitch = new THREE.ShaderMaterial({
+    transparent: true, depthTest: false, depthWrite: false, premultipliedAlpha: true,
+    uniforms: {
+      uFb: { value: null }, uMask: { value: maskTex }, uRes: { value: new THREE.Vector2() },
+      uDpr: { value: 1 }, uT: { value: 0 },
+    },
+    vertexShader: "void main(){ gl_Position = vec4(position.xy, 0., 1.); }",
+    fragmentShader: `
+uniform sampler2D uFb, uMask;
+uniform vec2 uRes;
+uniform float uDpr, uT;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+void main() {
+  vec2 px = 1. / (uRes * uDpr);
+  vec2 uv = gl_FragCoord.xy * px;
+  float a = smoothstep(.25, .55, texture2D(uMask, uv).r);
+  if (a <= .01) discard;
+  float y = (uRes.y * uDpr - gl_FragCoord.y) / uDpr;
+  float slip = (hash(vec2(floor(y / 5.), floor(uT * 20.))) - .5) * 26. * a;
+  float split = 7. * a;
+  vec4 r = texture2D(uFb, uv + vec2(slip + split, 0.) * uDpr * px);
+  vec4 g = texture2D(uFb, uv + vec2(slip, 0.) * uDpr * px);
+  vec4 b = texture2D(uFb, uv + vec2(slip - split, 0.) * uDpr * px);
+  float al = max(r.a, max(g.a, b.a));
+  if (al < .04) discard;                         // only on the ring itself
+  vec3 c = vec3(r.r, g.g, b.b);
+  float grain = hash(floor(gl_FragCoord.xy / uDpr) + floor(uT * 30.) * vec2(17.3, 41.9));
+  c = mix(c, vec3(step(.6, grain)), .15 * a);
+  float k = a * al;
+  gl_FragColor = vec4(c * k, k);
+}`,
+  });
+  const post = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), glitch);
+  post.frustumCulled = false;
+  const postScene = new THREE.Scene();
+  postScene.add(post);
+  const postCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  let fbTex = null;
+  const inkOnRing = () => {
+    const m = window.__inkMask, r = window.__ringRect;
+    if (!m || !m.active || !m.data || !r) return false;
+    // any ink inside the ring's box?
+    const x0 = Math.max(0, Math.floor((r.cx - r.rx) / W * m.w)), x1 = Math.min(m.w - 1, Math.ceil((r.cx + r.rx) / W * m.w));
+    const y0 = Math.max(0, Math.floor((1 - (r.cy + r.ry) / H) * m.h)), y1 = Math.min(m.h - 1, Math.ceil((1 - (r.cy - r.ry) / H) * m.h));
+    for (let y = y0; y <= y1; y++) for (let x = x0; x <= x1; x++) if (m.data[(y * m.w + x) * 4] > 70) return true;
+    return false;
+  };
 
   let W = 0, H = 0;
   const resize = () => {
@@ -186,6 +258,12 @@ async function start() {
     renderer.setSize(W, H, false);
     camera.aspect = W / H;
     camera.updateProjectionMatrix();
+    const dpr = renderer.getPixelRatio();
+    if (fbTex) fbTex.dispose();
+    fbTex = new THREE.FramebufferTexture(Math.round(W * dpr), Math.round(H * dpr));
+    glitch.uniforms.uFb.value = fbTex;
+    glitch.uniforms.uRes.value.set(W, H);
+    glitch.uniforms.uDpr.value = dpr;
     wake();
   };
 
@@ -223,10 +301,17 @@ async function start() {
       if (Math.abs(vYaw) > 1e-4) dragYaw += vYaw;
       if (Math.abs(vPitch) > 1e-4) dragPitch = clamp(dragPitch + vPitch, -0.7, 0.7);
     }
-    const sway = (!reduced && interactive && !drag) ? Math.sin(t * 0.0006) * 0.14 : 0;
+    const sway = (!reduced && interactive && !drag && !aim.on) ? Math.sin(t * 0.0006) * 0.14 : 0;
+    // the pointer is the light: the studio turns to follow it, so the highlights slide over the
+    // chrome, and the ring leans a little towards it
+    aim.x += (aim.tx - aim.x) * 0.08; aim.y += (aim.ty - aim.y) * 0.08;
+    lightMoving = Math.abs(aim.tx - aim.x) + Math.abs(aim.ty - aim.y) > 0.002;
+    const lean = interactive && !drag ? 1 : 0;
+    scene.environmentRotation.set(-aim.y * 0.9, aim.x * 1.4, 0);
+    key.position.set(aim.x * 520, -aim.y * 420 + 120, 420);
     pivot.rotation.set(
-      Math.sin(Math.PI * e) * 0.45 + dragPitch,
-      e * Math.PI * 2 + dragYaw + sway,
+      Math.sin(Math.PI * e) * 0.45 + dragPitch + aim.y * 0.16 * lean,
+      e * Math.PI * 2 + dragYaw + sway + aim.x * 0.22 * lean,
       Math.sin(Math.PI * e) * -0.18,
     );
 
@@ -238,6 +323,8 @@ async function start() {
     stage.classList.toggle("is-live", interactive);
 
     const onScreen = show > 0 && release < H * 1.2;
+    // the ring's footprint, which js/cursor-fx.js keeps its lit pixels off
+    window.__ringRect = onScreen && show > 0.5 ? { cx: x, cy: y, rx: h * 0.4, ry: h * 0.52 } : null;
     const moving = !reduced && (interactive || drag || Math.abs(vYaw) > 1e-4) || (p > 0 && p < 1) || release > 0;
     return { onScreen, moving };
   };
@@ -246,10 +333,32 @@ async function start() {
   const frame = t => {
     raf = 0;
     const { onScreen, moving } = place(t);
-    if (onScreen) renderer.render(scene, camera);
-    if (onScreen && moving) wake();
+    if (onScreen) {
+      renderer.render(scene, camera);
+      // not while the ring is being dragged, nor while that drag's smoke is still about (Linzhi):
+      // turning the ring by hand should show the ring, not the effect
+      if (!drag && t - dragEnded > 1500 && inkOnRing()) {
+        const m = window.__inkMask;
+        if (maskFrame !== m.frame || maskTex.image.width !== m.w) {
+          if (maskTex.image.width !== m.w || maskTex.image.height !== m.h) {
+            maskTex.image = { data: m.data, width: m.w, height: m.h };
+            maskTex.dispose();                   // new size: let three reallocate it
+          }
+          maskTex.image.data = m.data;
+          maskTex.needsUpdate = true;
+          maskFrame = m.frame;
+        }
+        glitch.uniforms.uT.value = t / 1000;
+        renderer.copyFramebufferToTexture(fbTex);
+        renderer.autoClear = false;
+        renderer.render(postScene, postCam);
+        renderer.autoClear = true;
+      }
+    }
+    if (onScreen && (moving || lightMoving)) wake();
   };
   function wake() { if (!raf) raf = requestAnimationFrame(frame); }
+  window.__ringWake = wake;                      // js/cursor-fx.js calls this while the smoke moves
   addEventListener("scroll", wake, { passive: true });
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") wake(); });
 
