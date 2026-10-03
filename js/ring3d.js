@@ -22,7 +22,10 @@ const MODEL = new URL("../assets/model/ring.glb", import.meta.url).href;
 const DRACO = new URL("../vendor/three/draco/", import.meta.url).href;
 const SCREEN_R = 10.4;                           // model units; the wordmark strip is 17 wide
 const SCREEN_ORANGE = 0xf27346;                  // sampled off the film's last frame
-const ORIENT = [Math.PI / 2, 0, 0];              // the bake's screen faces +Y; this turns it to the camera
+// The bake's screen faces +Y; this turns it to the camera AND the right way up: charging port at the
+// bottom, as in the film (Linzhi, 2026-10-03 -- the first orientation, [PI/2, 0, 0], had it on top).
+// Rz(PI) then Rx(-PI/2): the same facing, turned half round the line of sight.
+const ORIENT = [-Math.PI / 2, 0, Math.PI];
 
 const doc = document.documentElement;
 const canvas = document.getElementById("ring3d");
@@ -143,13 +146,16 @@ async function start() {
       new THREE.CircleGeometry(SCREEN_R, 96),
       new THREE.MeshBasicMaterial({ toneMapped: false }),
     );
-    uiDisc.rotation.copy(orangeDisc.rotation);
+    // Turning the ring right way up (ORIENT) turned the screen upside down with it; half a turn
+    // about the screen's own normal puts the frames, and below the wordmark, back upright.
+    uiDisc.rotation.set(-Math.PI / 2, 0, Math.PI);
     uiDisc.position.copy(orangeDisc.position);
     uiDisc.position.y += 0.08;
     uiDisc.scale.setScalar(UI_FIT);
     uiDisc.visible = false;
     logo.parent.add(uiDisc);
     logo.position.y += 0.05;                     // and the wordmark just clear of the orange disc
+    logo.rotation.y += Math.PI;                  // upright again after ORIENT's half turn
     logo.renderOrder = 1;
   }
   // every frame any feature names, loaded up front so switching never waits
