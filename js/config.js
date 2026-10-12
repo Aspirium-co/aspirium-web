@@ -80,11 +80,21 @@ window.SIGNET_CONFIG = {
   // Off since the film replaced the live render (2026-09-30): a film cannot be dragged.
   dragHint: { enabled: false, autoHideMs: 12000 },
 
+  // Pre-order form on presale.html (2026-10-11, Linzhi). A Formspree form URL, e.g.
+  // "https://formspree.io/f/abcdwxyz". Empty = js/presale.js falls back to opening a pre-filled
+  // email to `fallbackEmail`, so a reservation is never silently lost.
+  preorder: {
+    endpoint: "https://formspree.io/f/meaezvbd",
+    fallbackEmail: "linzhigettingit@gmail.com",
+  },
+
+  // Wired 2026-10-11 to the same Formspree form as the pre-order; `_subject` tells the two apart
+  // in the inbox, and `source` carries the ?c= serial.
   capture: {
-    endpoint: "",
+    endpoint: "https://formspree.io/f/meaezvbd",
     method: "POST",
-    fields: { email: "email", source: "tags" },
-    extra: {},
+    fields: { email: "email", source: "source" },
+    extra: { _subject: "Gemtronic update sign-up", type: "newsletter" },
     honeypot: "website", // bots fill it, humans never see it (§7: honeypot + provider rate limit, no CAPTCHA)
   },
 };

@@ -19,7 +19,7 @@ const walk = d => readdirSync(d).flatMap(n => { const p = join(d, n); return sta
 const TEXT = new Set([".html", ".css", ".js", ".mjs", ".txt", ".md"]);
 // CNAME must keep its exact name: GitHub Pages reads it out of the published artifact and
 // takes the custom domain from it, so a hashed copy would be ignored.
-const NOHASH = new Set(["_headers", "robots.txt", "index.html", "privacy.html", "CNAME"]);
+const NOHASH = new Set(["_headers", "robots.txt", "index.html", "privacy.html", "presale.html", "CNAME"]);
 const hashName = (rel, buf) => {
   const e = extname(rel); const h = createHash("sha256").update(buf).digest("hex").slice(0, 8);
   return rel.slice(0, -e.length) + "." + h + e;
@@ -38,8 +38,8 @@ const order = [
   join(root, "vendor/three/draco/draco_wasm_wrapper.js"), join(root, "vendor/three/draco/draco_decoder.wasm"),
   join(root, "vendor/three/LICENSE"),
   join(root, "viewer/bundle.js"), join(root, "viewer/index.html"),
-  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"), join(root, "js/ring3d.js"), join(root, "js/cursor-fx.js"), join(root, "js/features.js"),
-  join(root, "privacy.html"), join(root, "index.html"), join(root, "robots.txt"), join(root, "_headers"),
+  join(root, "js/config.js"), join(root, "js/mark.js"), join(root, "js/viewer-stub.js"), join(root, "js/viewer-embed.js"), join(root, "js/viewer-video.js"), join(root, "js/main.js"), join(root, "js/ring3d.js"), join(root, "js/cursor-fx.js"), join(root, "js/features.js"), join(root, "js/presale.js"),
+  join(root, "privacy.html"), join(root, "presale.html"), join(root, "index.html"), join(root, "robots.txt"), join(root, "_headers"),
   join(root, "CNAME"),
 ];
 const mapping = new Map(); // source rel → dist rel

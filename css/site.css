@@ -461,3 +461,76 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .submit, .stub, .stub img { transition: none !important; }
 }
+
+/* ---- contact and pre-order (2026-10-11, Linzhi) ----
+   Contact sits under the capture form, not in the footer: the footer type is 6 px and an address
+   has to be readable. The pre-order page reuses the sheet column and the submit pill. */
+.contact {
+  max-width: 36rem; margin: 3.5rem auto 0; text-align: center;
+  font-size: .875rem; color: var(--muted);
+}
+.contact .label { margin-bottom: .75rem; }
+.contact__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem 2rem; }
+.contact a, .link { color: var(--text); text-decoration: none; border-bottom: 1px solid var(--rule); transition: border-color .18s ease; }
+.contact a:hover, .contact a:focus-visible, .link:hover, .link:focus-visible { border-color: #fff; outline: none; }
+.preorder-cta { margin: 2.5rem 0 0; text-align: center; font-size: .875rem; color: var(--muted); }
+a.submit { display: inline-flex; align-items: center; text-decoration: none; }
+
+.panel--preorder { min-height: 100vh; display: flex; flex-direction: column; }
+@supports (height: 1svh) { .panel--preorder { min-height: 100svh; } }
+.panel--preorder .sheet { flex: 1; padding-top: clamp(3rem, 10vh, 7rem); }
+.preorder__body { margin: 0 0 2.5rem; color: var(--muted); max-width: 36rem; }
+.terms { margin: 0 0 2.5rem; border-top: 1px solid var(--rule); }
+.terms > div {
+  display: flex; justify-content: space-between; gap: 1rem;
+  padding: .875rem 0; border-bottom: 1px solid var(--rule);
+}
+.terms dt { font: 400 .8125rem/1.6 var(--body); letter-spacing: .16em; text-transform: uppercase; color: var(--muted); }
+.terms dd { margin: 0; text-align: right; color: var(--text); }
+.preorder__action { text-align: center; }
+.preorder__action .submit { margin-top: 0; }
+.preorder .contact { margin-top: 4rem; }
+.foot--plain { font-size: .6875rem; }
+.terms .was { color: var(--muted); margin-right: .4em; }
+.terms .note { display: block; font-size: .8125rem; color: var(--metal); }
+
+/* pre-order form: same field and pill treatment as the capture form */
+.reserve { position: relative; text-align: center; }
+.reserve__grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 1rem; text-align: left; }
+.field { display: block; min-width: 0; }
+.field .label { margin-bottom: .5rem; }
+.field--wide { grid-column: 1 / -1; }
+.reserve input:not([type="hidden"]), .reserve select {
+  width: 100%; height: 3rem; padding: 0 .875rem;
+  background: transparent; border: 1px solid var(--rule); border-radius: 0;
+  color: var(--text); font: 400 1rem var(--body); outline: none;
+  transition: border-color .18s ease;
+}
+.reserve select { appearance: none; -webkit-appearance: none; cursor: pointer;
+  background-image: linear-gradient(45deg, transparent 50%, var(--muted) 50%), linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+  background-position: calc(100% - 1.15rem) 50%, calc(100% - .8rem) 50%; background-size: .35rem .35rem; background-repeat: no-repeat; }
+.reserve select option { background: var(--field-2); color: var(--text); }
+.reserve input:hover, .reserve input:focus, .reserve select:hover, .reserve select:focus { border-color: #fff; }
+.reserve .submit { margin-top: 2rem; }
+@media (max-width: 480px) { .reserve__grid { grid-template-columns: 1fr; } }
+
+/* top navigation (2026-10-11, Linzhi). Fixed over every panel; waits with the lockup during the
+   opening beat so nothing is lit before the ring. */
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 20;
+  display: flex; justify-content: center; gap: clamp(1.25rem, 4vw, 2.75rem);
+  padding: calc(1.1rem + env(safe-area-inset-top, 0px)) var(--gutter) 1.1rem;
+  background: var(--field);                 /* solid, not a fade: the brand allows no gradients, and the page is black anyway */
+  transition: opacity .6s ease;
+}
+.nav a {
+  color: var(--muted); text-decoration: none;
+  font: 400 .75rem/1 var(--body); letter-spacing: .18em; text-transform: uppercase;
+  padding: .35rem 0; border-bottom: 1px solid transparent;
+  transition: color .18s ease, border-color .18s ease;
+}
+.nav a:hover, .nav a:focus-visible, .nav a[aria-current="page"] { color: var(--text); border-color: var(--rule); outline: none; }
+:root.is-opening .nav { opacity: 0; }
+html { scroll-behavior: smooth; }
+#about, #contact { scroll-margin-top: 4rem; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .nav { transition: none; } }

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Gemtronic by ASPIRIUM — Pre-order</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Reserve a Gemtronic ring.">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="css/site.css">
+<script src="js/config.js" defer></script>
+<script src="js/presale.js" defer></script>
+</head>
+<body>
+<!-- Pre-order (2026-10-11, Linzhi). Reservation only: no payment is taken here. The form posts to
+     the Formspree endpoint in js/config.js (preorder.endpoint); until that is set, js/presale.js
+     opens a pre-filled email instead. Price $329, pre-order 25% off (Linzhi, 2026-10-11); ship date TBA. -->
+<main class="page preorder">
+  <!-- top navigation (2026-10-11, Linzhi): pre-order, the product intro, contact -->
+  <nav class="nav" aria-label="Site">
+    <a href="index.html#about">About</a>
+    <a href="presale.html" aria-current="page">Pre-order</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <section class="panel panel--preorder">
+    <div class="sheet">
+      <p class="eyebrow">Pre-order</p>
+      <h1 class="about__title">Reserve a Gemtronic.</h1>
+      <p class="preorder__body">The first run is being made now. Reserve a ring and we will write to you
+        before it ships with a payment link. Pre-orders are 25% off. Reserving costs nothing and commits
+        you to nothing.</p>
+
+      <dl class="terms">
+        <div><dt>Price</dt><dd><s class="was">$329</s> $246.75 <span class="note">25% off for pre-orders</span></dd></div>
+        <div><dt>Ships</dt><dd>To be announced</dd></div>
+        <div><dt>Sizes</dt><dd>S&nbsp;(US&nbsp;5–6) · M&nbsp;(US&nbsp;7–8) · L&nbsp;(US&nbsp;9–10)</dd></div>
+        <div><dt>Fit</dt><dd>Open band, adjustable</dd></div>
+      </dl>
+
+      <form class="reserve" id="reserve" method="post" action="#" novalidate>
+        <div class="reserve__live">
+          <div class="reserve__grid">
+            <label class="field"><span class="label">Name</span>
+              <input name="name" type="text" autocomplete="name" required></label>
+            <label class="field"><span class="label">Email</span>
+              <input name="email" type="email" inputmode="email" autocomplete="email"
+                     autocapitalize="off" spellcheck="false" required></label>
+            <label class="field"><span class="label">Size</span>
+              <select name="size" required>
+                <option value="" selected disabled>Choose</option>
+                <option value="S">S (US 5–6)</option>
+                <option value="M">M (US 7–8)</option>
+                <option value="L">L (US 9–10)</option>
+                <option value="Not sure">Not sure yet</option>
+              </select></label>
+            <label class="field"><span class="label">Quantity</span>
+              <input name="quantity" type="number" inputmode="numeric" min="1" max="10" value="1" required></label>
+            <label class="field field--wide"><span class="label">Country</span>
+              <input name="country" type="text" autocomplete="country-name" required></label>
+          </div>
+          <input type="hidden" name="_subject" value="Gemtronic pre-order">
+          <div class="hp" aria-hidden="true">
+            <label>Leave this field empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label>
+          </div>
+          <button class="submit" type="submit">Reserve</button>
+          <p class="consent">No payment now. We will email you before it ships.</p>
+          <p class="status" role="status" aria-live="polite"></p>
+        </div>
+        <p class="received" hidden>Reserved. We will be in touch.</p>
+      </form>
+
+      <div class="contact" id="contact">
+        <p class="label">Contact</p>
+        <ul class="contact__list">
+          <li><a href="mailto:linzhigettingit@gmail.com">linzhigettingit@gmail.com</a></li>
+          <li><a href="https://www.instagram.com/aspirium.co/" target="_blank" rel="noopener">Instagram @aspirium.co</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <footer class="foot foot--plain">
+      <span>&copy; 2026 ASPIRIUM</span>
+      <span><a href="index.html">Home</a> &nbsp; <a href="privacy.html">Privacy</a></span>
+    </footer>
+  </section>
+</main>
+</body>
+</html>

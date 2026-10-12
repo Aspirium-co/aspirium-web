@@ -37,6 +37,12 @@
 </head>
 <body>
 <main class="page">
+  <!-- top navigation (2026-10-11, Linzhi): pre-order, the product intro, contact -->
+  <nav class="nav" aria-label="Site">
+    <a href="#about">About</a>
+    <a href="presale.html">Pre-order</a>
+    <a href="#contact">Contact</a>
+  </nav>
 
   <!-- the live ring: fixed over the page, drawn only while the about panel needs it (js/ring3d.js) -->
   <canvas class="ring3d" id="ring3d" aria-hidden="true"></canvas>
@@ -188,6 +194,16 @@
           <label>Leave this field empty <input type="text" name="website" tabindex="-1" autocomplete="off"></label>
         </div>
       </form>
+
+      <!-- pre-order and contact (2026-10-11, Linzhi). Personal address until a company inbox exists. -->
+      <p class="preorder-cta">Pre-orders are open. <a class="link" href="presale.html">Reserve a ring</a></p>
+      <div class="contact" id="contact">
+        <p class="label">Contact</p>
+        <ul class="contact__list">
+          <li><a href="mailto:linzhigettingit@gmail.com">linzhigettingit@gmail.com</a></li>
+          <li><a href="https://www.instagram.com/aspirium.co/" target="_blank" rel="noopener">Instagram @aspirium.co</a></li>
+        </ul>
+      </div>
 
     </div>
 
