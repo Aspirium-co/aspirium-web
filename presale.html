@@ -12,11 +12,12 @@
 <link rel="stylesheet" href="css/site.css">
 <script src="js/config.js" defer></script>
 <script src="js/presale.js" defer></script>
+<script src="js/contact.js" defer></script>
 </head>
 <body>
 <!-- Pre-order (2026-10-11, Linzhi). Reservation only: no payment is taken here. The form posts to
      the Formspree endpoint in js/config.js (preorder.endpoint); until that is set, js/presale.js
-     opens a pre-filled email instead. Price $329, pre-order 25% off (Linzhi, 2026-10-11); ship date TBA. -->
+     opens a pre-filled email instead. Price $329, pre-order 25% off (Linzhi, 2026-10-11); ships spring 2027. -->
 <main class="page preorder">
   <!-- top navigation (2026-10-11, Linzhi): pre-order, the product intro, contact -->
   <nav class="nav" aria-label="Site">
@@ -34,7 +35,7 @@
 
       <dl class="terms">
         <div><dt>Price</dt><dd><s class="was">$329</s> $246.75 <span class="note">25% off for pre-orders</span></dd></div>
-        <div><dt>Ships</dt><dd>To be announced</dd></div>
+        <div><dt>Ships</dt><dd>Spring 2027</dd></div>
         <div><dt>Sizes</dt><dd>S&nbsp;(US&nbsp;5–6) · M&nbsp;(US&nbsp;7–8) · L&nbsp;(US&nbsp;9–10)</dd></div>
         <div><dt>Fit</dt><dd>Open band, adjustable</dd></div>
       </dl>
@@ -74,9 +75,10 @@
       <div class="contact" id="contact">
         <p class="label">Contact</p>
         <ul class="contact__list">
-          <li><a href="mailto:linzhigettingit@gmail.com">linzhigettingit@gmail.com</a></li>
+          <li><a class="js-mail" href="mailto:linzhigettingit@gmail.com?subject=Hello%20from%20aspirium.co">linzhigettingit@gmail.com</a></li>
           <li><a href="https://www.instagram.com/aspirium.co/" target="_blank" rel="noopener">Instagram @aspirium.co</a></li>
         </ul>
+        <p class="contact__note" role="status" aria-live="polite"></p>
       </div>
     </div>
 

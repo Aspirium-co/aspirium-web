@@ -534,3 +534,4 @@ a.submit { display: inline-flex; align-items: center; text-decoration: none; }
 html { scroll-behavior: smooth; }
 #about, #contact { scroll-margin-top: 4rem; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .nav { transition: none; } }
+.contact__note { margin: .75rem 0 0; min-height: 1.4em; font-size: .8125rem; color: var(--metal); }

@@ -27,6 +27,7 @@
 <script src="js/config.js" defer></script>
 <script src="js/mark.js" defer></script>
 <script src="js/main.js" defer></script>
+<script src="js/contact.js" defer></script>
 <!-- the live ring in the about panel (js/ring3d.js). An import map is how a module finds "three"
      without a bundler; build.mjs rewrites the path to the hashed file. -->
 <script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js" } }</script>
@@ -200,9 +201,10 @@
       <div class="contact" id="contact">
         <p class="label">Contact</p>
         <ul class="contact__list">
-          <li><a href="mailto:linzhigettingit@gmail.com">linzhigettingit@gmail.com</a></li>
+          <li><a class="js-mail" href="mailto:linzhigettingit@gmail.com?subject=Hello%20from%20aspirium.co">linzhigettingit@gmail.com</a></li>
           <li><a href="https://www.instagram.com/aspirium.co/" target="_blank" rel="noopener">Instagram @aspirium.co</a></li>
         </ul>
+        <p class="contact__note" role="status" aria-live="polite"></p>
       </div>
 
     </div>
