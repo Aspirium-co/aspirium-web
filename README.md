@@ -257,7 +257,8 @@ assets/fonts/         ASPIRIUM Light + Literata + Source Serif 4, Latin subsets 
 assets/poster/        interim posters rendered from the reference build (2:1 desktop, 1:1 phone)
 dev/                  tune.html · check.mjs · cdp.mjs · capture-poster.mjs · sync-viewer.sh · build-fonts.sh — never deployed
 _headers              Cloudflare Pages headers (immutable hashed assets, noindex, nosniff) — only honoured there
-robots.txt            Disallow: / until both names clear (§1a)
+robots.txt            Allow: / and the sitemap, since 2026-10-26 (§1a cleared)
+sitemap.xml           the two public pages; privacy.html stays noindex until its notice is reviewed
 ```
 
 ## Rulings applied
