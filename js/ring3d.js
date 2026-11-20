@@ -36,7 +36,7 @@ const UI_DIR = new URL("../assets/ui/", import.meta.url).href;   // the firmware
 const UI_FIT = 0.86;      // the frame's 160 px circle, shrunk to sit inside the bezel's opening whole
 const FRAME_MS = 900;                                            // how long each of an item's screens shows
 const band = document.getElementById("band");
-const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduced = false;   // plays even when the system asks for reduced motion (Linzhi, 2026-11-19)
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const smooth = t => t * t * (3 - 2 * t);

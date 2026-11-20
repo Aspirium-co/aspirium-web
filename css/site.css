@@ -119,10 +119,6 @@ body {
   .panel--hero { height: 100svh; }
   .panel--capture { min-height: 100svh; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .hero__inner { transform: none; opacity: 1; }
-  .cue { opacity: 1; }
-}
 
 /* ---- about: the live ring and the intro (2026-09-30, after neoconda.com) ----
    The canvas is fixed over the whole page and draws nothing until the scroll starts (js/ring3d.js).
@@ -188,9 +184,6 @@ body {
   .about__stage { height: 42svh; }
   .about__title { margin-bottom: 1rem; }
   .about__hint { margin-top: 1.25rem; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .about__copy > * { transform: none; }
 }
 
 /* ---- features: the ring at the centre, the list passing on both sides (2026-10-01, after
@@ -258,9 +251,6 @@ body {
     grid-column: 1; grid-row: auto; justify-self: stretch; max-width: none;
     padding: 6svh 0;
   }
-}
-@media (prefers-reduced-motion: reduce) {
-  .feat, .feat__n { transition: none; }
 }
 
 /* ---- hero band ---- */
@@ -344,7 +334,6 @@ body {
   50%        { transform: translateX(44px)  rotate(9deg); }
   94%, 100%  { transform: translateX(-44px) rotate(-9deg); }
 }
-@media (prefers-reduced-motion: reduce) { .drag__pointer { animation: none; } }
 
 /* ---- the lockup: live text in Literata, below the band and clear of the render ---- */
 .mark {
@@ -458,9 +447,6 @@ body {
 @media (max-width: 480px) {
   .serial { font-size: .8125rem; letter-spacing: .12em; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .submit, .stub, .stub img { transition: none !important; }
-}
 
 /* ---- contact and pre-order (2026-10-11, Linzhi) ----
    Contact sits under the capture form, not in the footer: the footer type is 6 px and an address
@@ -533,5 +519,4 @@ a.submit { display: inline-flex; align-items: center; text-decoration: none; }
 :root.is-opening .nav { opacity: 0; }
 html { scroll-behavior: smooth; }
 #about, #contact { scroll-margin-top: 4rem; }
-@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } .nav { transition: none; } }
 .contact__note { margin: .75rem 0 0; min-height: 1.4em; font-size: .8125rem; color: var(--metal); }

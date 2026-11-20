@@ -35,7 +35,7 @@
     document.head.appendChild(st);
   }
 
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced = false;   // plays even when the system asks for reduced motion (Linzhi, 2026-11-19)
   const phone = matchMedia(SITE.phoneQuery).matches;
   // Every load replays the whole opening (Eric, 2026-09-09). This retires the brief's §2 "Return
   // visits" behaviour, which used a sessionStorage flag to mount at the end pose the second time in

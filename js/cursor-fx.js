@@ -21,7 +21,7 @@
 // Drawn only while there is fluid left.
 
 const fine = matchMedia("(hover: hover) and (pointer: fine)").matches;
-const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduced = false;   // plays even when the system asks for reduced motion (Linzhi, 2026-11-19)
 const canvas = document.getElementById("pixels");
 
 const CFG = {

@@ -16,7 +16,7 @@
 // Classic script: defines window.SignetMark = { attach(el, conf) -> api }.
 // api: { enabled, running, runs, run(durationMs, mode) }.
 (() => {
-  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reduced = false;   // plays even when the system asks for reduced motion (Linzhi, 2026-11-19)
 
   function attach(el, conf) {
     conf = conf || {};
